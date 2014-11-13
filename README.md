@@ -19,7 +19,7 @@ python setup.py install
 ```
 
 ## API Documentation
-* [bayeos.cli](http://bayceer.github.io/bayeos-python-cli/doc/api/bayeos.cli.html): Command line client for python console
+* [bayeos.cli](http://bayceer.github.io/bayeos-python-cli/api/bayeos.cli.html): Command line client for python console
 
 ## Workbooks  
 * [SimpleClient](http://nbviewer.ipython.org/github/BayCEER/bayeos-python-cli/blob/master/doc/simpleclient.ipynb): SimpleClient Example
