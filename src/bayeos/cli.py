@@ -1,30 +1,31 @@
 '''
 Created on 06.11.2014
-
 @author: oliver
 '''
 
 import base64, calendar, struct
 from bayeos import connectionFile, timeFilter
 from datetime import datetime
-from _datetime import timedelta
+
+
 
 try:
     from xmlrpc import client
 except ImportError:
     import xmlrpclib as client
-
+    
+    
 class SimpleClient():
         
-    _lookUp = {}    
-    _nDic = {"check_write":0,"check_exec":1,"id":2,"id_super":3,"art":4,"name":5,"rec_start":6,"rec_end":7,"plan_start":8,"plan_end":9,"active":10,"recordsMissing":11,"hasChild":12}
-    _proxy = None
-    _wd = None
-    _useDateTime = True
+    def __init__(self):
+        self._lookUp = {}    
+        self._nDic = {"check_write":0,"check_exec":1,"id":2,"id_super":3,"art":4,"name":5,"rec_start":6,"rec_end":7,"plan_start":8,"plan_end":9,"active":10,"recordsMissing":11,"hasChild":12}   
+        self._wd = None
+        self._useDateTime = True
+        self._proxy = None       
          
     def connect(self, url=None,user=None,password=None, save_as=None, verbose=False, listConnections=False):        
-        """Open a connection to server"""                
-                        
+        """Open a connection to server"""                        
         cons = connectionFile.readConnections()
         if listConnections:        
             print("Alias".ljust(20) + "|" + "URL".ljust(80) + "|" + "User".ljust(10))
@@ -45,23 +46,20 @@ class SimpleClient():
         assert(password)                                                     
                                                     
         print("Open connection to " + url + " as user " + user)            
-        self._proxy = client.ServerProxy(uri=url, allow_none=True, verbose=verbose)                
+        proxy = client.ServerProxy(uri=url, allow_none=True, verbose=verbose)                
         try: 
-            loginVec = self._proxy.LoginHandler.createSession(user, password)
+           
+            loginVec = proxy.LoginHandler.createSession(user, password)
             auth = str(loginVec[0]) + ":" + str(loginVec[1])
-            authBase = base64.b64encode(auth.encode())        
+            authBase = base64.b64encode(auth)        
 
             class SpecialTransport(client.Transport):
                 accept_gzip_encoding = False
-                def send_headers(self,connection, headers):
-                    connection.putheader("Authentication",authBase)
-                    for key, val in headers:
-                        connection.putheader(key, val)
-            self._proxy = client.ServerProxy(uri=url,transport=SpecialTransport(), allow_none=True, use_datetime= self._useDateTime, verbose=verbose)
-            assert(self._proxy)
+                def send_host(self, connection, headers):
+                    connection.putheader("Authentication", authBase)                                                                
+            self._proxy = client.ServerProxy(uri=url, transport=SpecialTransport(), verbose=verbose, allow_none=True, use_datetime= self._useDateTime)                                                
             
-            # Read only once               
-            
+            # Read only once                           
             self._lookUp['aggfunc'] = {x[1].lower():x[0] for x in self._proxy.LookUpTableHandler.getAgrFunktionen()}                    
             assert(self._lookUp['aggfunc'])                         
             self._lookUp['aggint']  = {x[1].lower():x[0] for x in self._proxy.LookUpTableHandler.getAgrIntervalle()}
@@ -84,7 +82,7 @@ class SimpleClient():
     
     def disconnect(self):
         """ Close server connection """
-        print("Close connection")
+        print("Close connection")        
         return self._proxy.LogOffHandler.terminateSession()           
     
     def getVersion(self):
@@ -108,26 +106,28 @@ class SimpleClient():
         
     
     def createSeries(self, name, folderId=None):
+        """ Creates a new series in folder. Uses current folder if folderId is null """ 
         if not folderId:
             folderId = self._getPwdId()
         assert(folderId)            
         return self._proxy.TreeHandler.newNode("messung_massendaten",name,folderId)[self._nDic["id"]]                                    
     
     def deleteSeries(self, seriesId):
+        """ Deletes a series and all of its records."""
         return self._proxy.TreeHandler.deleteNode(seriesId)                
      
     def __printByte(self, b):
         for idx, val in enumerate(b):
             print(idx, val)   
     
-    def writeSeries(self,ids,data,dataPerBulk=10000):
+    def writeSeries(self,ids,data,dataPerBulk=10000, overwrite=False):
         """
         Write data frame values to an existing series. Splits data in bulk of size dataPerBulk                 
         Parameters.
         
             ids =   [id,...] 
             data = [[datetime, value, value, ...], ...]
-            update 
+            overwrite 
                 False:=  Insert mode, existing records with the same time and series id are skipped 
                 True :=  Upsert mode, existing records with the same sampling time and series id are updated                
         """                               
@@ -141,11 +141,19 @@ class SimpleClient():
                 _bytes = _bytes + s.pack(ids[x],msec,row[x+1])
                 i=i+1
                 if (i%dataPerBulk==0):
-                    self._proxy.MassenTableHandler.upsertByteRows(_bytes)
-                    _bytes = b''                    
+                    if (overwrite):
+                        self._proxy.MassenTableHandler.upsertByteRows(client.Binary(_bytes))    
+                    else:
+                        self._proxy.MassenTableHandler.addByteRows(client.Binary(_bytes))                    
+                    _bytes = b''                            
         
         if (len(_bytes)>0):
-            self._proxy.MassenTableHandler.upsertByteRows(_bytes)            
+            if (overwrite):
+                self._proxy.MassenTableHandler.upsertByteRows(client.Binary(_bytes))
+            else:
+                self._proxy.MassenTableHandler.addByteRows(client.Binary(_bytes))
+        print(str(i) + " records imported.")                            
+                        
     
     def getSeries(self, ids=None,start='yesterday',until='today',interval=None,aggfunc=None,aggint=None, statusFilter=[0,1,2,3,4,5,6,7,8,9]):               
             """ Returns a (header, data) record 
@@ -218,7 +226,7 @@ class SimpleClient():
         """ Print out the current working folder name."""       
         print(self._proxy.TreeHandler.getNodePath(self._wd[self._nDic["id"]]))
             
-    def isoToDateTime(self,iso):
+    def _isoToDateTime(self,iso):
         """ Formats an iso date string to %Y-%m-%d %H:%M:%S """
         _dfmt = "%Y-%m-%d %H:%M:%S"
         if not iso:
@@ -234,8 +242,8 @@ class SimpleClient():
         print(self._proxy.TreeHandler.getNodePath(self._getPwdId()))
         print(str(self._wd[self._nDic["id_super"]]).ljust(10) + "|..")                        
         for node in self._pwdChildList():                         
-            _start = self.isoToDateTime(node[self._nDic["rec_start"]])
-            _end = self.isoToDateTime(node[self._nDic["rec_end"]]) 
+            _start = self._isoToDateTime(node[self._nDic["rec_start"]])
+            _end = self._isoToDateTime(node[self._nDic["rec_end"]]) 
             _art = node[self._nDic["art"]]                                                       
             print(str(node[self._nDic["id"]]).ljust(10) + "|" + (node[self._nDic["name"]] + "").ljust(50) + "|" + _art.ljust(20) + "|" + _start.ljust(20) + "|" + _end.ljust(20) )
                 
@@ -265,6 +273,7 @@ class SimpleClient():
         return nodes  
     
     def getProxy(self):
+        """ Returns the XMLRPC Server proxy """
         return self._proxy  
 
 
