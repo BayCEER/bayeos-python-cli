@@ -2,12 +2,12 @@
 Created on 11.08.2014
 @author: oliver
 '''
-import unittest, datetime, struct
+import unittest, datetime
 from bayeos.cli import SimpleClient as cli
 
 user = "root"
 password = "bayeos"
-url = "http://bayeos-master/BayEOS-Server/XMLServlet"
+url = "http://bti3x3/BayEOS-Server/XMLServlet"
 
 
 class CliTest(unittest.TestCase):
@@ -26,7 +26,7 @@ class CliTest(unittest.TestCase):
     
     def testConnect(self):                                                                                       
         # Save and open connection information            
-        self.assertEqual(True, self.cli.connect(url,user,password,save_as="myAlias",verbose=True),"Connect failed")
+        self.assertEqual(True, self.cli.connect(url,user,password,save_as="myAlias"),"Connect failed")
         self.assertIsNotNone(self.cli.getVersion(), "Failed to get version")        
         self.assertTrue(self.cli.disconnect(), "Failed to disconnect")        
         
@@ -41,16 +41,7 @@ class CliTest(unittest.TestCase):
         self.assertIsNotNone(self.cli.getVersion(), "Failed to get version")
         self.assertTrue(self.cli.disconnect(), "Failed to disconnect")
         
-    def testAddByteValues(self):
-        """
-            Create a series and add a row 
-        """
-        self.assertEqual(True, self.cli.connect(url,user,password),"Connect failed")
-        id = self.cli.createSeries("Dummy with one record")                 
-        self.cli.getProxy().MassenTableHandler.upsertByteRows(struct.pack('>iqf',id,1415606942969,12.0))
-        self.cli.deleteSeries(id)
-        self.assertTrue(self.cli.disconnect(), "Failed to disconnect")
-        
+          
     def testCreateDeleteSeries(self):
         """ 
             CRUD Example with response validation
