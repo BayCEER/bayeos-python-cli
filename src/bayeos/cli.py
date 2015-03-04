@@ -8,7 +8,6 @@ from bayeos import connectionFile, timeFilter
 from datetime import datetime
 
 
-
 try:
     from xmlrpc import client
 except ImportError:
@@ -22,7 +21,8 @@ class SimpleClient():
         self._nDic = {"check_write":0,"check_exec":1,"id":2,"id_super":3,"art":4,"name":5,"rec_start":6,"rec_end":7,"plan_start":8,"plan_end":9,"active":10,"recordsMissing":11,"hasChild":12}   
         self._wd = None
         self._useDateTime = True
-        self._proxy = None       
+        self._proxy = None 
+        self._transport = None
          
     def connect(self, url=None,user=None,password=None, save_as=None, verbose=False, listConnections=False):        
         """Open a connection to server"""                        
@@ -51,13 +51,18 @@ class SimpleClient():
            
             loginVec = proxy.LoginHandler.createSession(user, password)
             auth = str(loginVec[0]) + ":" + str(loginVec[1])
-            authBase = base64.b64encode(auth)        
+            authBase = base64.b64encode(auth.encode())            
+                    
 
             class SpecialTransport(client.Transport):
                 accept_gzip_encoding = False
                 def send_host(self, connection, headers):
-                    connection.putheader("Authentication", authBase)                                                                
-            self._proxy = client.ServerProxy(uri=url, transport=SpecialTransport(), verbose=verbose, allow_none=True, use_datetime= self._useDateTime)                                                
+                    connection.putheader("Authentication", authBase) 
+                def send_headers(self,connection, headers):
+                    connection.putheader("Authentication",authBase)      
+                              
+            self._transport = SpecialTransport()                   
+            self._proxy = client.ServerProxy(uri=url, transport=self._transport, verbose=verbose, allow_none=True, use_datetime= self._useDateTime)                                                
             
             # Read only once                           
             self._lookUp['aggfunc'] = {x[1].lower():x[0] for x in self._proxy.LookUpTableHandler.getAgrFunktionen()}                    
@@ -81,9 +86,13 @@ class SimpleClient():
         return True
     
     def disconnect(self):
-        """ Close server connection """
-        print("Close connection")        
-        return self._proxy.LogOffHandler.terminateSession()           
+        """ Close server connection """                
+        try:
+            print("Terminate session")
+            return self._proxy.LogOffHandler.terminateSession()
+        finally:
+            ## print("Close transport")               
+            self._transport.close()                    
     
     def getVersion(self):
             """ Returns the BayEOS server version """        
