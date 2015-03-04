@@ -1,6 +1,6 @@
-pydoc3.py -w bayeos 
-pydoc3.py -w bayeos.cli
-pydoc3.py -w bayeos.simpleEncryptor
-pydoc3.py -w bayeos.timeFilter
-pydoc3.py -w bayeos.connectionFile
+python %PYTHON2_HOME%\Lib\pydoc.py -w bayeos 
+python %PYTHON2_HOME%\Lib\pydoc.py -w bayeos.cli
+python %PYTHON2_HOME%\Lib\pydoc.py -w bayeos.simpleEncryptor
+python %PYTHON2_HOME%\Lib\pydoc.py -w bayeos.timeFilter
+python %PYTHON2_HOME%\Lib\pydoc.py -w bayeos.connectionFile
 move *.html ..\doc\api
