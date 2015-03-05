@@ -23,9 +23,10 @@
 <a href="calendar.html">calendar</a><br>
 </td><td width="25%" valign=top><a href="xmlrpclib.html">xmlrpclib</a><br>
 <a href="bayeos.connectionFile.html">bayeos.connectionFile</a><br>
-</td><td width="25%" valign=top><a href="struct.html">struct</a><br>
-<a href="bayeos.timeFilter.html">bayeos.timeFilter</a><br>
-</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top><a href="math.html">math</a><br>
+<a href="struct.html">struct</a><br>
+</td><td width="25%" valign=top><a href="bayeos.timeFilter.html">bayeos.timeFilter</a><br>
+</td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -82,14 +83,17 @@ Parameters:<br>
 
 <dl><dt><a name="SimpleClient-pwd"><strong>pwd</strong></a>(self)</dt><dd><tt>Print&nbsp;out&nbsp;the&nbsp;current&nbsp;working&nbsp;folder&nbsp;name.</tt></dd></dl>
 
-<dl><dt><a name="SimpleClient-writeSeries"><strong>writeSeries</strong></a>(self, ids, data, dataPerBulk<font color="#909090">=10000</font>, overwrite<font color="#909090">=False</font>)</dt><dd><tt>Write&nbsp;data&nbsp;frame&nbsp;values&nbsp;to&nbsp;an&nbsp;existing&nbsp;series.&nbsp;Splits&nbsp;data&nbsp;in&nbsp;bulk&nbsp;of&nbsp;size&nbsp;dataPerBulk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+<dl><dt><a name="SimpleClient-writeSeries"><strong>writeSeries</strong></a>(self, ids, data, dataPerBulk<font color="#909090">=10000</font>, overwrite<font color="#909090">=False</font>, skipNaN<font color="#909090">=True</font>)</dt><dd><tt>Write&nbsp;data&nbsp;frame&nbsp;values&nbsp;to&nbsp;an&nbsp;existing&nbsp;series.&nbsp;Splits&nbsp;data&nbsp;in&nbsp;bulk&nbsp;of&nbsp;size&nbsp;dataPerBulk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
 Parameters.<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ids&nbsp;=&nbsp;&nbsp;&nbsp;[id,...]&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;=&nbsp;[[datetime,&nbsp;value,&nbsp;value,&nbsp;...],&nbsp;...]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;overwrite&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;False:=&nbsp;&nbsp;Insert&nbsp;mode,&nbsp;existing&nbsp;records&nbsp;with&nbsp;the&nbsp;same&nbsp;time&nbsp;and&nbsp;series&nbsp;id&nbsp;are&nbsp;skipped&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;:=&nbsp;&nbsp;Upsert&nbsp;mode,&nbsp;existing&nbsp;records&nbsp;with&nbsp;the&nbsp;same&nbsp;sampling&nbsp;time&nbsp;and&nbsp;series&nbsp;id&nbsp;are&nbsp;updated</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;:=&nbsp;&nbsp;Upsert&nbsp;mode,&nbsp;existing&nbsp;records&nbsp;with&nbsp;the&nbsp;same&nbsp;sampling&nbsp;time&nbsp;and&nbsp;series&nbsp;id&nbsp;are&nbsp;updated&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;skipNaN<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;:=&nbsp;Skip&nbsp;NaN&nbsp;values&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;False:=&nbsp;Write&nbsp;NaN&nbsp;values</tt></dd></dl>
 
 </td></tr></table></td></tr></table>
 </body></html>
