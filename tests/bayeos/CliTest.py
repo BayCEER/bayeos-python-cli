@@ -7,7 +7,7 @@ from bayeos.cli import SimpleClient
 
 user = "root"
 password = "bayeos"
-url = "http://bti3x3/BayEOS-Server/XMLServlet"
+url = "http://bayeos-dev/BayEOS-Server/XMLServlet"
 
 
 class CliTest(unittest.TestCase):
