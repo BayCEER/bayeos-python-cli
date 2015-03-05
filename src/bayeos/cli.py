@@ -3,7 +3,7 @@ Created on 06.11.2014
 @author: oliver
 '''
 
-import base64, calendar, struct
+import base64, calendar, struct, math
 from bayeos import connectionFile, timeFilter
 from datetime import datetime
 
@@ -129,7 +129,7 @@ class SimpleClient():
         for idx, val in enumerate(b):
             print(idx, val)   
     
-    def writeSeries(self,ids,data,dataPerBulk=10000, overwrite=False):
+    def writeSeries(self,ids,data,dataPerBulk=10000, overwrite=False, skipNaN=True):
         """
         Write data frame values to an existing series. Splits data in bulk of size dataPerBulk                 
         Parameters.
@@ -138,7 +138,10 @@ class SimpleClient():
             data = [[datetime, value, value, ...], ...]
             overwrite 
                 False:=  Insert mode, existing records with the same time and series id are skipped 
-                True :=  Upsert mode, existing records with the same sampling time and series id are updated                
+                True :=  Upsert mode, existing records with the same sampling time and series id are updated 
+            skipNaN
+                True := Skip NaN values 
+                False:= Write NaN values  
         """                               
         _bytes = b''
         i = 0        
@@ -146,15 +149,16 @@ class SimpleClient():
         for row in data:  
             # Rounds to seconds           
             msec = calendar.timegm(row[0].timetuple())*1000                                   
-            for x in range(0,len(ids)):                                                                              
-                _bytes = _bytes + s.pack(ids[x],msec,row[x+1])
-                i=i+1
-                if (i%dataPerBulk==0):
-                    if (overwrite):
-                        self._proxy.MassenTableHandler.upsertByteRows(client.Binary(_bytes))    
-                    else:
-                        self._proxy.MassenTableHandler.addByteRows(client.Binary(_bytes))                    
-                    _bytes = b''                            
+            for x in range(0,len(ids)):
+                if (not (math.isnan(row[x+1]) and skipNaN == True) ):                                                                                               
+                    _bytes += s.pack(ids[x],msec,row[x+1])
+                    i +=1
+                    if (i%dataPerBulk==0):
+                        if (overwrite):
+                            self._proxy.MassenTableHandler.upsertByteRows(client.Binary(_bytes))    
+                        else:
+                            self._proxy.MassenTableHandler.addByteRows(client.Binary(_bytes))                    
+                        _bytes = b''                            
         
         if (len(_bytes)>0):
             if (overwrite):
