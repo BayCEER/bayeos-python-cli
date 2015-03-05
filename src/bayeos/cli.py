@@ -146,7 +146,7 @@ class SimpleClient():
         _bytes = b''
         i = 0        
         s = struct.Struct('>iqf')                
-        for row in data:  
+        for row in data:              
             # Rounds to seconds           
             msec = calendar.timegm(row[0].timetuple())*1000                                   
             for x in range(0,len(ids)):
