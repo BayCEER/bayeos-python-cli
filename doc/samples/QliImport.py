@@ -6,16 +6,16 @@ Created on 04.03.2015
 @author: oliver.archner@uni-bayreuth.de
 
 Imports vaisala qli csv files
-Uses bayeos.cli.SimpleClient for connection 
+Uses bayeos.cli.SimpleClient 
  
 Requirements:   + Existing series for each column
                 + Write privileges on series
                 + Connection alias
                 + CSV File with format:
 
-                Date, Time, m{ID}, m{id}, ...
-                30.1.2015,03:10:00,94.84,-1.91
-                30.1.2015,03:20:00,'#N/A,-1.92
+                Date, Time, m{id}, m{id}, ...
+                30.1.2015,03:10:00,94.84,-1.91,...
+                30.1.2015,03:20:00,'#N/A,-1.92,...
 '''
 import csv
 import sys
