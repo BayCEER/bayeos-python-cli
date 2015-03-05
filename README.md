@@ -23,5 +23,5 @@ python setup.py install
 
 ## Example Usage   
 * [SimpleClient](http://nbviewer.ipython.org/github/BayCEER/bayeos-python-cli/blob/master/doc/simpleclient.ipynb): CRUD example for IPython
-* [QliImport](http://bayceer.github.io/bayeos-python-cli/doc/samples/QliImport.py): Upload script for CSV files 
+* [QliImport](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/QliImport.py): Upload script for CSV files 
 
