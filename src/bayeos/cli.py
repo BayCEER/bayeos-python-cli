@@ -23,6 +23,7 @@ class SimpleClient():
         self._useDateTime = True
         self._proxy = None 
         self._transport = None
+        self._rootFolderId = None 
          
     def connect(self, url=None,user=None,password=None, save_as=None, verbose=False, listConnections=False):        
         """Open a connection to server"""                        
@@ -40,10 +41,7 @@ class SimpleClient():
         if save_as: 
             if not connectionFile.write(save_as, url, user, password):
                 print("WARN", "Failed to save file")
-            
-        assert(url)
-        assert(user)
-        assert(password)                                                     
+                                                                     
                                                     
         print("Open connection to " + url + " as user " + user)            
         proxy = client.ServerProxy(uri=url, allow_none=True, verbose=verbose)                
@@ -76,9 +74,11 @@ class SimpleClient():
             self._lookUp['intervaltypes']  =  self._proxy.LookUpTableHandler.getIntervalTypes()
             assert(self._lookUp['intervaltypes'])            
 
-            # Working dir to root  
+            # Working dir to root              
             self._wd =  self._proxy.TreeHandler.getRoot('messung_ordner',False,None,None)
             assert(self._wd)
+                         
+            self._rootFolderId = self._wd[self._nDic["id"]]
                         
         except client.Error as v:
             print("ERROR", v)
@@ -88,7 +88,7 @@ class SimpleClient():
     def disconnect(self):
         """ Close server connection """                
         try:
-            print("Terminate session")
+            print("Connection closed")
             return self._proxy.LogOffHandler.terminateSession()
         finally:
             ## print("Close transport")               
@@ -123,7 +123,62 @@ class SimpleClient():
     
     def deleteSeries(self, seriesId):
         """ Deletes a series and all of its records."""
-        return self._proxy.TreeHandler.deleteNode(seriesId)                
+        return self._proxy.TreeHandler.deleteNode(seriesId)
+    
+    def __validPath(self, path):        
+        if ("//" in path) or len(path) == 0 or path.endswith("/"):
+            return False
+        else: 
+            return True
+    
+    def findOrCreateSeries(self,path):
+        """ Creates a new series by path only if series does not exist. """
+        """ Uses current folder as parent folder if path is relative. """ 
+        """ Path folders are created recursively """
+        
+        """ 
+            Parameters:
+                path: Path to series like '/ParentFolder/ChildFolder/SeriesName' or 'ParentFolder/ChildFolder/SeriesName'
+            Returns: 
+                Series id
+        """
+        
+        
+        if not self.__validPath(path):
+            print("Not a valid path:{}".format([path]))
+            return None
+                        
+        if path.startswith("/"):
+            return self.__findOrCreateSeries(path[1:],self._rootFolderId)
+        else:
+            return self.__findOrCreateSeries(path,self._getPwdId())
+            
+    def __findOrCreateSeries(self, path, folderId):    
+        # print("Path: " + path + " FolderId:" + str(folderId))   
+        
+        items = path.split('/')        
+        if len(items) == 1:
+            art = 'messung_massendaten'
+        else:
+            art = 'messung_ordner'
+        
+        # id = self._proxy.TreeHandler.findOrSaveNode(art,items[0],folderId)[self._nDic["id"]]
+        id = self.findOrCreateNode(art,items[0],folderId)
+        
+        if len(items) == 1:
+            return id
+        else:
+            return self.__findOrCreateSeries('/'.join(items[1:]),id)
+    
+    def findOrCreateNode(self, art, name, parentId):        
+        childs = self._proxy.TreeHandler.getChilds(parentId,art,None,None,None)
+        for child in childs:
+            if child[self._nDic["name"]] == name:
+                # print("Node:{} found.".format(name))  
+                return child[self._nDic["id"]]
+        print("Creating node:{}".format(name))        
+        return self._proxy.TreeHandler.newNode(art,name,parentId)[self._nDic["id"]]
+        
      
     def __printByte(self, b):
         for idx, val in enumerate(b):
