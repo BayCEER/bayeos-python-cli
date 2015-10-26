@@ -22,8 +22,6 @@ import sys
 import datetime
 from bayeos.cli import SimpleClient 
 
-test = False
-
 def main():
     
     if len(sys.argv)!=3:
@@ -32,12 +30,11 @@ def main():
             
     infile = open(sys.argv[2],'r')
     
-    if not test:
-        cli = SimpleClient()
-        cli.connect(url=sys.argv[1])
+    cli = SimpleClient()
+    cli.connect(url=sys.argv[1])
                                        
     reader = csv.reader(infile)
-    headers = reader.next()                          
+    headers = next(reader)                          
         
     ids =  [int(x[1:]) for x in headers[2:]]      
     data = []                     
@@ -53,13 +50,9 @@ def main():
                 else:
                     rec.append(float(row[i]))             
             data.append(rec)
-            if test:
-                print(rec)
-    
-    if not test:                                                                    
-        cli.writeSeries(ids, data)
-        cli.disconnect()
-                                                                          
+                                                                   
+    cli.writeSeries(ids, data)
+    cli.disconnect()                                                                          
     infile.close()
                 
 
