@@ -107,7 +107,21 @@ class CliTest(unittest.TestCase):
         self.assertEqual(True, self.cli.connect(url,user,password),"Connect failed")        
         self.cli.pwd()
         self.cli.ls()   
-        self.assertTrue(self.cli.disconnect(), "Failed to disconnect")             
+        self.assertTrue(self.cli.disconnect(), "Failed to disconnect")  
+        
+    def testFindOrCreateSeries(self):
+        # Connect
+        self.assertEqual(True, self.cli.connect(url,user,password),"Connect failed")
+        
+                
+        # Create Series 
+        ids = [self.cli.findOrCreateSeries("/testFolder/" + x) for x in ["A","B","C"] ]        
+        self.assertTrue(len(ids)==3,'Invalid function response')
+        
+        # Find Series only 
+        ids = [self.cli.findOrCreateSeries("/testFolder/" + x) for x in ["A","B","C","D"] ]
+        self.assertTrue(len(ids)==4,'Invalid function response')        
+                   
 
 if __name__ == "__main__":
    
