@@ -22,7 +22,7 @@ python setup.py install
 * [bayeos.cli](http://bayceer.github.io/bayeos-python-cli/api/bayeos.cli.html): Command line client for python console
 
 ## Example Usage   
-* [Basics](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/simpleclient.ipynb): CRUD example for IPython
-* [Import](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/QliImport.py): Upload script for CSV files
-* [Plot](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/plotSeries.ipynb): Plotting example
+* [Basics](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/Simpleclient.ipynb): CRUD example for IPython
+* [Import](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/CSmport.py): Upload script for CSV files
+* [Plot](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/PlotSeries.ipynb): Plotting example
 
