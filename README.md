@@ -23,6 +23,6 @@ python setup.py install
 
 ## Example Usage   
 * [Basics](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/Simpleclient.ipynb): CRUD example for IPython
-* [Import](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/CSmport.py): Upload script for CSV files
+* [Import](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/CSImport.py): Upload script for CSV files
 * [Plot](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/PlotSeries.ipynb): Plotting example
 
