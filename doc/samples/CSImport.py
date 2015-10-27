@@ -33,19 +33,18 @@ def main():
     con = sys.argv[1]
     path = sys.argv[2]
     file = open(sys.argv[3],'r')
-    
     tzOffset = int(sys.argv[4])
     
     
     # Connection 
     cli = SimpleClient()
     cli.connect(con)
-                                       
+    
+    # Open File
     reader = csv.reader(file)          
     
     # Check format 
     head = next(reader)
-    
     if head[0] != 'TOACI1':
         print("File format:{} not supported.".format(head[0]));
         sys.exit(1)
@@ -57,7 +56,7 @@ def main():
     else:
         origin = path + "/" + relPath
                                      
-    # Channel paths
+    # Create series by path
     ids = [cli.findOrCreateSeries(origin + "/" + cha) for cha in next(reader)[1:]]
                 
     # Channel data   

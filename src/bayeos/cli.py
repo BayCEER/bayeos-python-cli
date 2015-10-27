@@ -154,27 +154,22 @@ class SimpleClient():
             return self.__findOrCreateSeries(path,self._getPwdId())
             
     def __findOrCreateSeries(self, path, folderId):    
-        # print("Path: " + path + " FolderId:" + str(folderId))   
-        
         items = path.split('/')        
         if len(items) == 1:
             art = 'messung_massendaten'
         else:
-            art = 'messung_ordner'
-        
-        # id = self._proxy.TreeHandler.findOrSaveNode(art,items[0],folderId)[self._nDic["id"]]
-        id = self.findOrCreateNode(art,items[0],folderId)
-        
+            art = 'messung_ordner'        
+        id = self.findOrCreateNode(art,items[0],folderId)        
         if len(items) == 1:
             return id
         else:
             return self.__findOrCreateSeries('/'.join(items[1:]),id)
     
     def findOrCreateNode(self, art, name, parentId):        
+	""" Create a new node if it does not exist."""
         childs = self._proxy.TreeHandler.getChilds(parentId,art,None,None,None)
         for child in childs:
             if child[self._nDic["name"]] == name:
-                # print("Node:{} found.".format(name))  
                 return child[self._nDic["id"]]
         print("Creating node:{}".format(name))        
         return self._proxy.TreeHandler.newNode(art,name,parentId)[self._nDic["id"]]
