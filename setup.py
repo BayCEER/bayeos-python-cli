@@ -13,3 +13,13 @@ setup(name='bayeos-python-cli',
       packages=['bayeos'],
       package_dir = {'': 'src'})
 
+
+setup(name='bayeos-python-frame',
+      version='1.2',
+      description='A bayeoes-server frame client',
+      url='http://github.com/BayCEER/bayeos-python-frame',
+      author='Oliver Archner',
+      author_email='oliver.archner@uni-bayreuth.de',
+      license='GPL2',
+      packages=['bayeos', 'bayeos.frame', ],
+      package_dir = {'': 'src'})

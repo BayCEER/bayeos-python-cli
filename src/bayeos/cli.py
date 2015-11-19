@@ -6,6 +6,7 @@ Created on 06.11.2014
 import base64, calendar, struct, math
 from bayeos import connectionFile, timeFilter
 from datetime import datetime
+import pytz
 
 
 try:
@@ -113,6 +114,13 @@ class SimpleClient():
         """ Get a list of supported time zone names """
         return self._lookUp['tz']
         
+    def getNode(self,id):
+        """ Get node as dictionary """        
+        node = self._proxy.TreeHandler.getNode(id)
+        ret = {}       
+        for prop,index in self._nDic.iteritems():
+            ret[prop] = node[index]
+        return ret 
     
     def createSeries(self, name, folderId=None):
         """ Creates a new series in folder. Uses current folder if folderId is null """ 
@@ -201,9 +209,13 @@ class SimpleClient():
         _bytes = b''
         i = 0        
         s = struct.Struct('>iqf')                
-        for row in data:              
-            # Rounds to seconds           
-            msec = calendar.timegm(row[0].timetuple())*1000                                   
+        for row in data:                          
+            if row[0].tzinfo:
+                dt = row[0].astimezone(pytz.utc)
+            else:
+                dt = row[0]                                    
+            # Rounds to seconds
+            msec = calendar.timegm(dt.timetuple())*1000                                   
             for x in range(0,len(ids)):
                 if (not (math.isnan(row[x+1]) and skipNaN == True) ):                                                                                               
                     _bytes += s.pack(ids[x],msec,row[x+1])
@@ -343,6 +355,8 @@ class SimpleClient():
     def getProxy(self):
         """ Returns the XMLRPC Server proxy """
         return self._proxy  
+    
+ 
 
 
 

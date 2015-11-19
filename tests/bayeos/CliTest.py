@@ -120,7 +120,10 @@ class CliTest(unittest.TestCase):
         
         # Find Series only 
         ids = [self.cli.findOrCreateSeries("/testFolder/" + x) for x in ["A","B","C","D"] ]
-        self.assertTrue(len(ids)==4,'Invalid function response')        
+        self.assertTrue(len(ids)==4,'Invalid function response')  
+        
+         
+              
                    
 
 if __name__ == "__main__":
