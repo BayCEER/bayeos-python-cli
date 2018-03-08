@@ -1,9 +1,9 @@
 ![bayeos python logo](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/logoHorizontal.png "Logo")
+- A simple python client to access a BayEOS Server  
+- Runs on Python2 and Python3  
+- Basic access functionality to read and write observation data   
 
-A simple python client to access a BayEOS Server. Runs on Python2 and Python3.
-Provides basic access functionality.
-
-##Installation 
+## Installation 
 You can use pip or the setup.py script to install the package.
 ### PIP
 Get the source from git via a git pull request and install the package:
