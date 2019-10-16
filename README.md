@@ -13,7 +13,7 @@ Get the source from git via a git pull request and install the package:
 ### Setup.py 
 Install the package by a git clone request followed by a run of setup.py:
 ``` 
-git clone htttps://github.com/BayCEER/bayeos-python-cli.git
+git clone https://github.com/BayCEER/bayeos-python-cli.git
 cd bayeos-python-cli
 python setup.py install
 ```
@@ -22,6 +22,6 @@ python setup.py install
 * [bayeos.cli](http://bayceer.github.io/bayeos-python-cli/api/bayeos.cli.html): Command line client for python console
 
 ## Example Usage
-[Python](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/python)
-[Workbooks](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/workbooks) 
+* [Python](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/python)
+* [Workbooks](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/samples/workbooks) 
 
