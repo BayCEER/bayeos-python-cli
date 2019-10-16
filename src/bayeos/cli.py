@@ -173,16 +173,14 @@ class SimpleClient():
         else:
             return self.__findOrCreateSeries('/'.join(items[1:]),id)
     
-    def findOrCreateNode(self, art, name, parentId):        
-	""" Create a new node if it does not exist."""
+    def findOrCreateNode(self, art, name, parentId):
         childs = self._proxy.TreeHandler.getChilds(parentId,art,None,None,None)
         for child in childs:
             if child[self._nDic["name"]] == name:
                 return child[self._nDic["id"]]
         print("Creating node:{}".format(name))        
         return self._proxy.TreeHandler.newNode(art,name,parentId)[self._nDic["id"]]
-        
-     
+
     def __printByte(self, b):
         for idx, val in enumerate(b):
             print(idx, val)   
