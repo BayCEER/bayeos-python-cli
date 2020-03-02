@@ -1,6 +1,6 @@
 ![bayeos python logo](https://github.com/BayCEER/bayeos-python-cli/blob/master/doc/logoHorizontal.png "Logo")
 - A simple python client to access a BayEOS Server  
-- Runs on Python2 and Python3  
+- Runs on Python3  
 - Basic access functionality to read and write observation data   
 
 ## Installation 

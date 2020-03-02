@@ -5,9 +5,11 @@ Created on 18.08.2014
 '''
 from datetime import datetime, timedelta
 import calendar
+import pytz
 
-def get(now,start='yesterday',until='today',interval=None):
-    """ Returns a start,until record """ 
+
+def get(now, start='yesterday',until='today',interval=None):
+    """ Returns a start,until record """     
     today = now.replace(hour=0,minute=0,second=0,microsecond=0)
     yesterday = today - timedelta(days=1)    
     tomorrow = today + timedelta(days=1)
@@ -58,5 +60,15 @@ def get(now,start='yesterday',until='today',interval=None):
                 start = datetime(today.year-1,1,1)                 
             else: 
                 raise Exception("Invalid interval format specified.\nMust be:{today|this week|this month|this year|yesterday|last week|last month|last year}")         
-          
-    return start,until 
+
+    if start.tzinfo:        
+        start = start.astimezone(pytz.utc)
+    else:
+        start = pytz.utc.localize(start)          
+
+    if until.tzinfo:        
+        until = until.astimezone(pytz.utc)
+    else:
+        until = pytz.utc.localize(until)          
+      
+    return start,until

@@ -24,7 +24,9 @@ class SimpleClient():
         self._useDateTime = True
         self._proxy = None 
         self._transport = None
-        self._rootFolderId = None 
+        self._rootFolderId = None
+        self._tzRPC = pytz.timezone('Etc/GMT-1')
+ 
          
     def connect(self, url=None,user=None,password=None, save_as=None, verbose=False, listConnections=False):        
         """Open a connection to server"""                        
@@ -45,14 +47,14 @@ class SimpleClient():
                                                                      
                                                     
         print("Open connection to " + url + " as user " + user)            
-        proxy = client.ServerProxy(uri=url, allow_none=True, verbose=verbose)                
+        
         try: 
-           
-            loginVec = proxy.LoginHandler.createSession(user, password)
-            auth = str(loginVec[0]) + ":" + str(loginVec[1])
-            authBase = base64.b64encode(auth.encode())            
-                    
 
+            with client.ServerProxy(uri=url, allow_none=True, verbose=verbose) as proxy:
+                loginVec = proxy.LoginHandler.createSession(user, password)
+                auth = str(loginVec[0]) + ":" + str(loginVec[1])
+                authBase = base64.b64encode(auth.encode())            
+            
             class SpecialTransport(client.Transport):
                 accept_gzip_encoding = False
                 def send_host(self, connection, headers):
@@ -202,13 +204,13 @@ class SimpleClient():
         _bytes = b''
         i = 0        
         s = struct.Struct('>iqf')                
-        for row in data:                          
+        for row in data:     
+            # Create UTC date                     
             if row[0].tzinfo:
                 dt = row[0].astimezone(pytz.utc)
             else:
-                dt = row[0]                                    
-            # Rounds to seconds
-            msec = calendar.timegm(dt.timetuple())*1000                                   
+                dt = pytz.utc.localize(row[0])
+            msec=int((dt-datetime(1970,1,1,tzinfo=pytz.utc)).total_seconds() * 1000)                                  
             for x in range(0,len(ids)):
                 if (not (math.isnan(row[x+1]) and skipNaN == True) ):                                                                                               
                     _bytes += s.pack(ids[x],msec,row[x+1])
@@ -228,15 +230,15 @@ class SimpleClient():
         print(str(i) + " records imported.")                            
                         
     
-    def getSeries(self, ids=None,start='yesterday',until='today',interval=None,aggfunc=None,aggint=None, statusFilter=[0,1,2,3,4,5,6,7,8,9]):               
-            """ Returns a (header, data) record 
+    def getSeries(self,ids=None,start='yesterday',until='today',interval=None,aggfunc=None,aggint=None, statusFilter=[0,1,2,3,4,5,6,7,8,9]):               
+            """ Returns a (header, data) record: 
                 header = [name, ...]
                 data = [[datetime, value ,value, ...], ...]                
              
             Parameters:
-                ids: int, or list of series ids. Tries to pick up to 10 series ids of current working folder if argument is None
-                start: 'today'|'yesterday' or string with format %Y-%m-%d %H:%M:%S
-                until: 'today'|'yesterday' or string with format %Y-%m-%d %H:%M:%S}
+                ids: int, or list of series ids. Tries to pick up to 10 series ids of the current working folder if argument is None
+                start: 'today'|'yesterday' or string with format %Y-%m-%d %H:%M:%S (UTC)
+                until: 'today'|'yesterday' or string with format %Y-%m-%d %H:%M:%S (UTC)
                 interval: today|this week|this month|this year|yesterday|last week|last month|last year
                 aggfunc: aggregation function name as string. For a list of valid parameters call getAggFunc() 
                 aggint: aggregation interval name as string. For a list of valid parameters call getAggInt()
@@ -255,9 +257,8 @@ class SimpleClient():
                     print("Current folder contains no series to fetch.\nPlease cd() to a folder containing series or pass ids as an argument.\n")
                     return None                                
             assert(ids)
-            
-            (start,until) = timeFilter.get(datetime.now(),start,until,interval)
-            
+            (start,until) = timeFilter.get(datetime.utcnow(),start,until,interval) 
+                                    
             # Check time interval
             if (start >= until):
                 raise Exception("Invalid time values.")            
@@ -270,14 +271,13 @@ class SimpleClient():
             if aggint:
                 if aggint not in self._lookUp['aggint']:
                     raise Exception("Invalid aggregation interval name.\nValid names:{" + "|".join(self._lookUp['aggint']) + "}")
-            
-            
-            m = self._getMatrix(ids,[start,until],aggfunc,aggint,statusFilter)                                                
+
+            m = self._getMatrix(ids,[start.astimezone(self._tzRPC),until.astimezone(self._tzRPC)],aggfunc,aggint,statusFilter)                                                
             data = []        
             rowlength = 4+4*len(m[0])                                
             for n in range(0,len(m[1].data),rowlength):
-                row = struct.unpack_from(">i" + len(m[0])*'f',m[1].data, offset=n)                
-                a = [datetime.fromtimestamp(row[0]-60*60)]
+                row = struct.unpack_from(">i" + len(m[0])*'f',m[1].data, offset=n)                                                
+                a = [datetime.fromtimestamp(row[0]).astimezone(pytz.utc)]
                 for value in row[1:]:
                     a.append(value)            
                 data.append(a)                            

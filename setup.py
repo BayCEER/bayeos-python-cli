@@ -4,7 +4,7 @@ except ImportError:
 	from distutils.core import setup 
 
 setup(name='bayeos-python-cli',
-      version='1.3',
+      version='1.4',
       description='A simple bayeoes-server client',
       url='http://github.com/BayCEER/bayeos-python-cli',
       author='Oliver Archner',
@@ -18,7 +18,7 @@ setup(name='bayeos-python-cli',
 
 
 setup(name='bayeos-python-frame',
-      version='1.3',
+      version='1.4',
       description='A bayeoes-server frame client',
       url='http://github.com/BayCEER/bayeos-python-frame',
       author='Oliver Archner',
