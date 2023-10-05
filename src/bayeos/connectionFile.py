@@ -93,7 +93,7 @@ def _readConnections(key,conFile):
                 cons[v[0]] = [v[1],v[2],simpleEncryptor.decrypt(key, v[3])]
             else:
                 file.close() 
-                raise Exception("Invalid file format: " + file)
+                raise Exception("Invalid file format: " + conFile)
     file.close()
     return cons
 
